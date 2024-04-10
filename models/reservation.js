@@ -9,10 +9,6 @@ const reservationSchema = new mongoose.Schema(
     numPassengers: {
       type: Number,
       required: true,
-      validate: {
-        validator: (v) => v === this.passengers.length,
-        message: 'Number of passengers does not match the provided info',
-      },
     },
     passengers: [
       {

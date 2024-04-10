@@ -57,8 +57,6 @@ exports.searchFlights = async (req, res) => {
  * @apiError    Server Error 500 with error message
  */
 exports.addFlight = async (req, res) => {
-  // Should have admin permission authentication here (or in previous middleware)
-
   // Should validate all required body fields
 
   const {
@@ -112,20 +110,18 @@ exports.addFlight = async (req, res) => {
 };
 
 /**
- * @api {put} /:flightId/price  updatePrice
- * @apiName updatePrice
+ * @api {put} /flight/:flightId/price  UpdatePrice
+ * @apiName UpdatePrice
  * @apiGroup Flight
  * @apiDescription ToB use | Update price for a flight (Admin permission needed)
  *
  * @apiParam {String} flightId  The flight to be updated
  * @apiQuery {Number} newPrice  The new price
  *
- * @apiSuccess  Return the added flight
+ * @apiSuccess  Return the updated flight
  * @apiError    Server Error 500 with error message
  */
 exports.updatePrice = async (req, res) => {
-  // Should have admin permission authentication here (or in previous middleware)
-
   try {
     // Check if flight exists
     let flight = await Flight.findById(req.params.flightId);
@@ -144,6 +140,51 @@ exports.updatePrice = async (req, res) => {
     }
 
     flight.price = newPrice;
+    flight = await flight.save();
+
+    res.status(200).json({
+      message: 'Flight is updated successfully',
+      flight,
+    });
+  } catch (err) {
+    res.status(500).json({
+      msg: 'Server Error',
+      err: err.message,
+    });
+  }
+};
+
+/**
+ * @api {put} /flight/:flightId/status  UpdateStatus
+ * @apiName UpdateStatus
+ * @apiGroup Flight
+ * @apiDescription ToB use | Update status for a flight (Admin permission needed)
+ *
+ * @apiParam {String} flightId   The flight to be updated
+ * @apiQuery {Number} newStatus  The new status
+ *
+ * @apiSuccess  Return the updated flight
+ * @apiError    Server Error 500 with error message
+ */
+exports.updateStatus = async (req, res) => {
+  try {
+    // Check if flight exists
+    let flight = await Flight.findById(req.params.flightId);
+    if (!flight) {
+      return res
+        .status(400)
+        .json({ errors: [{ msg: 'Cannot find the flight' }] });
+    }
+
+    const { newStatus } = req.query;
+
+    if (newStatus === flight.status) {
+      return res
+        .status(400)
+        .json({ errors: [{ msg: 'Please update with a different status' }] });
+    }
+
+    flight.status = newStatus;
     flight = await flight.save();
 
     res.status(200).json({

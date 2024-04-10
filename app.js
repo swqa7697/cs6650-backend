@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const flightRoutes = require('./routes/flight');
 const userRoutes = require('./routes/user');
+const agenda = require('./util/agenda');
 const config = require('./config/config.json');
 const port = process.env.PORT || 3000;
 
@@ -43,5 +44,9 @@ mongoose
   .catch((err) => {
     console.log(err);
   });
+
+agenda.start().then(() => {
+  console.log('Agenda connected to Database and started...');
+});
 
 module.exports = app;

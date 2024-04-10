@@ -3,5 +3,10 @@
   "airlineCode": "",
 
   "mongodbConnectURI": "",
-  "dbName": ""
+  "dbName": "",
+
+  "CognitoRegion": "",
+  "CognitoUserPoolId": "",
+  "CognitoTokenUse": "access",
+  "CognitoTokenExpiration": 8640000
 }

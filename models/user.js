@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const reservation = require('./reservation');
 
 const userSchema = new mongoose.Schema(
   {
@@ -10,8 +11,10 @@ const userSchema = new mongoose.Schema(
     },
     reservations: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Reservation',
+        reservation: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'Reservation',
+        },
       },
     ],
   },
