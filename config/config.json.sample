@@ -1,0 +1,7 @@
+{
+  "airline": "",
+  "airlineCode": "",
+
+  "mongodbConnectURI": "",
+  "dbName": ""
+}
