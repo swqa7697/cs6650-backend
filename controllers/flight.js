@@ -29,6 +29,7 @@ exports.searchFlights = async (req, res) => {
       destination,
       departureDate,
       status: 'scheduled',
+      $expr: { $lt: ['$reserved', '$capacity'] },
     });
 
     res.status(200).json({ flights });
