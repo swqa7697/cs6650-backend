@@ -8,5 +8,7 @@
   "CognitoRegion": "",
   "CognitoUserPoolId": "",
   "CognitoTokenUse": "access",
-  "CognitoTokenExpiration": 8640000
+  "CognitoTokenExpiration": 8640000,
+
+  "apiNinjasKey": ""
 }

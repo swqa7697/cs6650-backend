@@ -11,10 +11,12 @@ const flightSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    // Use airport codes (iata) for simplicity
     departure: {
       type: String,
       required: true,
     },
+    // Use airport codes (iata) for simplicity
     destination: {
       type: String,
       required: true,
@@ -22,11 +24,6 @@ const flightSchema = new mongoose.Schema(
     // Use UTC time for simplicity
     departureTime: {
       type: Date,
-      required: true,
-    },
-    // A reference used for search, also in UTC time
-    departureDate: {
-      type: String,
       required: true,
     },
     // Flight time in minutes

@@ -1,3 +1,4 @@
+const axios = require('axios');
 const Flight = require('../models/flight');
 const config = require('../config/config.json');
 
@@ -9,7 +10,7 @@ const config = require('../config/config.json');
  *
  * @apiQuery {String} departure     The airport code of the departure
  * @apiQuery {String} destination   The airport code of the destination
- * @apiQuery {String} departureDate Departure date (in UTC time)
+ * @apiQuery {String} departureDate Departure date (in UTC time) in the format of mm/dd/yyyy
  *
  * @apiSuccess  {Object[]} Array of flights
  * @apiError    Server Error 500 with error message
@@ -17,17 +18,36 @@ const config = require('../config/config.json');
 exports.searchFlights = async (req, res) => {
   // Should validate all required query fields
 
-  const { departure, destination } = req.query;
-
-  const d = new Date(req.query.departureDate);
-  const departureDate =
-    d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate();
+  const { departure, destination, departureDate } = req.query;
 
   try {
+    const airportInfoRes = await axios.get(
+      'https://api.api-ninjas.com/v1/airports',
+      {
+        params: {
+          iata: departure,
+        },
+        headers: {
+          'X-Api-Key': config.apiNinjasKey,
+        },
+      },
+    );
+
+    const tz = new Date()
+      .toLocaleString('en-US', {
+        timeZone: airportInfoRes.data[0].timezone,
+        hour12: false,
+        timeZoneName: 'short',
+      })
+      .split(' ')[2];
+
+    const startOfDay = new Date(`${departureDate}, 00:00 ${tz}`);
+    const endOfDay = new Date(`${departureDate}, 23:59 ${tz}`);
+
     const flights = await Flight.find({
       departure,
       destination,
-      departureDate,
+      departureTime: { $gte: startOfDay, $lte: endOfDay },
       status: 'scheduled',
       $expr: { $lt: ['$reserved', '$capacity'] },
     });
@@ -50,7 +70,7 @@ exports.searchFlights = async (req, res) => {
  * @apiBody {Number} flightCode    The flight number without airline prefix
  * @apiBody {String} departure     The airport code of the departure
  * @apiBody {String} destination   The airport code of the destination
- * @apiBody {String} departureTime A string representing departure time (in UTC time)
+ * @apiBody {String} departureTime Departure time (Should be result of Date.toUTCString())
  * @apiBody {String} travelTime    Flight time in minutes
  * @apiBody {Number} capacity      Max number of passengers can be carried in this flight
  *
@@ -79,9 +99,6 @@ exports.addFlight = async (req, res) => {
     });
   }
 
-  const departureDate =
-    d.getFullYear() + '/' + (d.getMonth() + 1) + '/' + d.getDate();
-
   try {
     let flight = new Flight({
       airline: config.airline,
@@ -89,7 +106,6 @@ exports.addFlight = async (req, res) => {
       departure,
       destination,
       departureTime,
-      departureDate,
       travelTime,
       capacity,
       price,
