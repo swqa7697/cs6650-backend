@@ -33,9 +33,10 @@ exports.searchFlights = async (req, res) => {
       },
     );
 
+    const tzLong = airportInfoRes.data[0].timezone;
     const tz = new Date()
       .toLocaleString('en-US', {
-        timeZone: airportInfoRes.data[0].timezone,
+        timeZone: tzLong,
         hour12: false,
         timeZoneName: 'short',
       })
@@ -47,12 +48,15 @@ exports.searchFlights = async (req, res) => {
     const flights = await Flight.find({
       departure,
       destination,
-      departureTime: { $gte: startOfDay, $lte: endOfDay },
+      departureTime: {
+        $gte: startOfDay.toISOString(),
+        $lte: endOfDay.toISOString(),
+      },
       status: 'scheduled',
       $expr: { $lt: ['$reserved', '$capacity'] },
     });
 
-    res.status(200).json({ flights });
+    res.status(200).json({ flights, timezone: tzLong });
   } catch (err) {
     res.status(500).json({
       msg: 'Server error',
