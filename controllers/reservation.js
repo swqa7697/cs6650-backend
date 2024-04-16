@@ -38,7 +38,7 @@ exports.confirmReservation = async (req, res) => {
 };
 
 /**
- * @api {put} /reservation/confirm  CancelReservationAuto
+ * @api {put} /reservation/autoCancel  CancelReservationAuto
  * @apiName CancelReservationAuto
  * @apiGroup Reservation
  * @apiDescription ToB use | Cancel an order when booking returning flight failed
