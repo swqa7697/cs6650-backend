@@ -74,7 +74,7 @@ exports.searchFlights = async (req, res) => {
  * @apiBody {Number} flightCode    The flight number without airline prefix
  * @apiBody {String} departure     The airport code of the departure
  * @apiBody {String} destination   The airport code of the destination
- * @apiBody {String} departureTime Departure time (Should be result of Date.toUTCString())
+ * @apiBody {String} departureTime Departure time (Locale time in the location of departure)
  * @apiBody {String} travelTime    Flight time in minutes
  * @apiBody {Number} capacity      Max number of passengers can be carried in this flight
  *
@@ -95,22 +95,31 @@ exports.addFlight = async (req, res) => {
     currency,
   } = req.body;
 
-  const d = new Date(departureTime);
-
-  if (d.toUTCString() !== departureTime) {
-    res.status(400).json({
-      msg: 'Format of departure time is not valid',
-    });
-  }
-
   try {
+    const depDate = new Date(departureTime);
+
+    const airportInfoRes = await axios.get(
+      'https://api.api-ninjas.com/v1/airports',
+      {
+        params: {
+          iata: departure,
+        },
+        headers: {
+          'X-Api-Key': config.apiNinjasKey,
+        },
+      },
+    );
+
+    const tzLong = airportInfoRes.data[0].timezone;
+
     let flight = new Flight({
       airline: config.airline,
       flightNumber: config.airlineCode + ' ' + flightCode,
       departure,
       destination,
-      departureTime,
+      departureTime: depDate.toISOString(),
       travelTime,
+      timezone: tzLong,
       capacity,
       price,
       currency,

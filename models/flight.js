@@ -21,7 +21,7 @@ const flightSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    // Use UTC time for simplicity
+    // Use UTC time for consistency
     departureTime: {
       type: Date,
       required: true,
@@ -29,6 +29,11 @@ const flightSchema = new mongoose.Schema(
     // Flight time in minutes
     travelTime: {
       type: Number,
+      required: true,
+    },
+    // Time zone of the location of departure
+    timezone: {
+      type: String,
       required: true,
     },
     capacity: {
