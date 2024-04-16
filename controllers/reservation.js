@@ -8,12 +8,19 @@ const Reservation = require('../models/reservation');
  * @apiDescription ToC use | Confirm an order after purchase
  *
  * @apiBody {String} reservationId
+ * @apiBody {String} purchaseId
  *
  * @apiSuccess  Success message
  * @apiError    Server Error 500 with error message
  */
 exports.confirmReservation = async (req, res) => {
-  const { reservationId } = req.body;
+  const { reservationId, purchaseId } = req.body;
+
+  if (!reservationId || !purchaseId) {
+    return res
+      .status(400)
+      .json({ errors: [{ msg: 'Missing order ID or purchase ID' }] });
+  }
 
   try {
     // Find the reservation record
@@ -26,6 +33,7 @@ exports.confirmReservation = async (req, res) => {
     }
 
     reservation.status = 'confirmed';
+    reservation.purchaseId = purchaseId;
     await reservation.save();
 
     res.status(200).send('Your reservation is confirmed');

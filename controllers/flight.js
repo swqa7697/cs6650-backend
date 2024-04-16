@@ -56,7 +56,7 @@ exports.searchFlights = async (req, res) => {
       $expr: { $lt: ['$reserved', '$capacity'] },
     });
 
-    res.status(200).json({ flights, timezone: tzLong });
+    res.status(200).json(flights);
   } catch (err) {
     res.status(500).json({
       msg: 'Server error',
