@@ -10,5 +10,7 @@
   "CognitoTokenUse": "access",
   "CognitoTokenExpiration": 8640000,
 
-  "apiNinjasKey": ""
+  "apiNinjasKey": "",
+
+  "adminUsers": []
 }

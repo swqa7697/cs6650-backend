@@ -5,9 +5,9 @@ const { isCognitoAuth } = require('../middleware/is-auth');
 const router = express.Router();
 
 // Retrieve booking history
-router.get('/reservations', UserController.getReservations);
+router.get('/reservations', isCognitoAuth, UserController.getReservations);
 
 // Reserve a flight
-router.post('/book', UserController.bookFlight);
+router.post('/book', isCognitoAuth, UserController.bookFlight);
 
 module.exports = router;

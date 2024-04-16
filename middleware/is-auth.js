@@ -1,5 +1,4 @@
 const CognitoExpress = require('cognito-express');
-const User = require('../models/user');
 const config = require('../config/config.json');
 
 const cognitoExpress = new CognitoExpress({
@@ -49,8 +48,27 @@ const isCognitoAuthOpt = (req, res, next) => {
 };
 
 const isCognitoAuthAdmin = (req, res, next) => {
-  // Will be implemented
-  next();
+  const token = req.header('cognito-token');
+  if (!token) {
+    return res.status(401).send('Access Token not found');
+  }
+
+  // Authenticate the token
+  cognitoExpress.validate(token, (err, response) => {
+    if (err) {
+      return res.status(401).json({ err });
+    }
+
+    // Check if the user is an authorized administrator
+    if (!config.adminUsers.includes(response.sub)) {
+      return res.status(401).send('Admin permission required');
+    }
+
+    // Token has been authenticated. Proceed info to the API
+    req.userSub = response.sub;
+
+    next();
+  });
 };
 
 module.exports = {

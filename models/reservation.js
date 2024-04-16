@@ -2,6 +2,10 @@ const mongoose = require('mongoose');
 
 const reservationSchema = new mongoose.Schema(
   {
+    orderId: {
+      type: String,
+      required: true,
+    },
     flight: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Flight',
@@ -32,6 +36,7 @@ const reservationSchema = new mongoose.Schema(
       default: 'pending',
     },
   },
+  { timestamps: true },
   { collection: 'reservations' },
 );
 
