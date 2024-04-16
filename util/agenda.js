@@ -1,5 +1,4 @@
 const Agenda = require('agenda');
-const mongoose = require('mongoose');
 const Flight = require('../models/flight');
 const Reservation = require('../models/reservation');
 const config = require('../config/config.json');
@@ -21,26 +20,17 @@ agenda.define('revoke reservation', async (job) => {
   try {
     let reservation = await Reservation.findById(reservationId);
 
+    // Cancel the order if it's still pending (not purchased)
     if (reservation.status === 'pending') {
-      const session = await mongoose.startSession();
+      reservation.status = 'canceled';
+      await reservation.save();
 
-      await session
-        .withTransaction(async () => {
-          reservation.status = 'canceled';
-          await reservation.save();
-
-          let flight = await Flight.findById(flightId);
-          if (flight) {
-            flight.reserved = flight.reserved - reservation.numPassengers;
-            await flight.save();
-          }
-        })
-        .catch((err) => {
-          session.endSession();
-          throw err;
-        });
-
-      session.endSession();
+      // Find and update the flight
+      let flight = await Flight.findById(flightId);
+      if (flight) {
+        flight.reserved = flight.reserved - reservation.numPassengers;
+        await flight.save();
+      }
     }
   } catch (err) {
     console.log(err.message);
