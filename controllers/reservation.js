@@ -63,10 +63,10 @@ exports.cancelReservationAuto = async (req, res) => {
     // Find the reservation record
     let reservation = await Reservation.findById(reservationId);
 
-    // Cancel the order only if it's already confirmed
-    if (reservation.status !== 'confirmed') {
+    // Check if it's already canceled
+    if (reservation.status === 'canceled') {
       return res.status(400).json({
-        errors: [{ msg: 'The order is not purchased or already canceled' }],
+        errors: [{ msg: 'The order is already canceled' }],
       });
     }
 
