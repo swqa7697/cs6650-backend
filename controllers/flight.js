@@ -77,6 +77,8 @@ exports.searchFlights = async (req, res) => {
  * @apiBody {String} departureTime Departure time (Locale time in the location of departure)
  * @apiBody {String} travelTime    Flight time in minutes
  * @apiBody {Number} capacity      Max number of passengers can be carried in this flight
+ * @apiBody {Number} price         The initial price of this flight
+ * @apiBody {Number} currency      The default currency of the initial price
  *
  * @apiSuccess  Return the added flight
  * @apiError    Server Error 500 with error message
