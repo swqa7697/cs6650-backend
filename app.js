@@ -12,6 +12,7 @@ const port = process.env.PORT || 3000;
 app = express();
 
 app.use(cors());
+app.disable('etag');
 app.use(
   express.json({
     verify: (req, res, buf) => {
