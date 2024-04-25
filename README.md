@@ -1,5 +1,6 @@
 <h1>Deploy An API Server For An Airline</h1>
-<b>1. Clone this repo</b>
+
+<h4>1. Clone this repo</h4>
 
 Install Git in your system, and run:
 
@@ -8,7 +9,7 @@ git clone https://github.com/swqa7697/cs6650-backend.git
 cd cs6650-backend
 ```
 
-<b>2. Configure</b>
+<h4>2. Configure</h4>
 
 Before starting the server, there are several things to be prepared:
 
@@ -39,7 +40,7 @@ The correct config.json will be like:
 }
 ```
 
-<b>3. Install Dependencies</b>
+<h4>3. Install Dependencies</h4>
 
 Install Node.js in your system, and run the command under the directory '/cs6650-backend':
 
@@ -47,7 +48,7 @@ Install Node.js in your system, and run the command under the directory '/cs6650
 npm install
 ```
 
-<b>4. Start Server</b>
+<h4>4. Start Server</h4>
 
 ```
 npm start
@@ -55,11 +56,11 @@ npm start
 
 <h2>Additional: Deploy The Load Balancer</h2>
 
-One (or one cluster of) load balancer(s) is used for all api servers under the same subsystem/airline
+The load balancer is used for all api servers under the same subsystem/airline
 
-<b>1. Install Nginx</b>
+<h4>1. Install Nginx</h4>
 
-In an independent VM (idealy) or in any one of the api servers (for test/demo), install Nginx and start it by:
+In an extra instance (idealy) or in any one of the api servers (for test/demo), install Nginx and start it by:
 
 (For Ubuntu)
 ```
@@ -68,7 +69,7 @@ sudo systemctl start nginx
 sudo systemctl enable nginx
 ```
 
-<b>2. Configure</b>
+<h4>2. Configure</h4>
 
 Go to the directory:
 
@@ -97,7 +98,7 @@ server {
 
 Change the URLs like 'backend1.example.com' to be address of your api servers, and keep the ports to be 3000. If you are using EC2 deploying all the servers including load balancer under the same VPC, you can use the private IPv4 address instead of public address
 
-<b>3. Reload Nginx</b>
+<h4>3. Reload Nginx</h4>
 
 Then, validate the config and reload Nginx by running:
 
@@ -105,3 +106,62 @@ Then, validate the config and reload Nginx by running:
 sudo nginx -t
 sudo systemctl reload nginx
 ```
+
+<h2>Configure API Gateway</h2>
+
+The instruction below shows the configuration of Amazon API Gateway, triggering 2 Amazon Lambda Functions
+
+<h4>1. Create Required Layer For Lambda</h4>
+
+Download the zip file here: [axios.zip](https://github.com/swqa7697/cs6650-additional-files/releases/download/Downloads/axios.zip)
+
+- In your AWS console, go to <b>Lambda</b> - <b>Additional resources</b> - <b>Layers</b>, and click <b>Create layer</b>
+- Fill 'axios' in the fields <b>Name</b> and <b>Description</b>, and keep other options as default
+- Upload the zip file just downloaded and create the layer
+
+Record the <b>Version ARN</b> for later use
+
+<h4>2. Create Lambda Functions</h4>
+
+Download these 2 files:
+[cs6650-airline-aggregation.zip](https://github.com/swqa7697/cs6650-additional-files/releases/download/Downloads/cs6650-airline-aggregation.zip)
+and
+[cs6650-airline-routing.zip](https://github.com/swqa7697/cs6650-additional-files/releases/download/Downloads/cs6650-airline-routing.zip)
+
+- Unzip them and edit the two 'constants.mjs' files according to the comments (configuring the airlines with their related load balancers)
+  - The two 'constants.mjs' should be exactly same, so you can just edit one of them and use it for both functions
+- Click <b>Create function</b> in the Lambda console to create function
+  - There are two functions should be created, one called aggregation and another one called routing, both using the default Node.js runtime
+- Copy/paste the code from the files you downloaded into the related functions
+  - Make sure for both functions, the edited 'constants.mjs' are uploaded
+- For both functions, at the bottom of the <b>Code</b> page, click <b>Add a layer</b>, and choose <b>Specify an ARN</b> and enter the <b>Version ARN</b> you got in the previous step. Add the layer
+
+<h4>3. Create API Gateway</h4>
+In the AWS console, find API Gateway:
+
+- Click on <b>Create API</b>, and find <b>REST API</b>
+  - Then, click on <b>Build</b>
+  - Choose <b>New API</b>, and specify an API name
+  - Click on <b>Create API</b>
+- In the API just created, use <b>Create resource</b> to build API routes(endpoints) with the same structure of backend servers
+  - Enable the CORS option(checkbox) when creating each resource
+
+```
+/flight/flights          GET   aggregation
+/flight/new              POST  routing
+/reservation/autoCancel  PUT   routing
+/reservation/confirm     PUT   routing
+/user/book               POST  routing
+/user/reservations       GET   aggregation
+```
+
+- Use <b>Create Method</b> in each route specified above, Choosing the related Method type (GET/POST/PUT)
+  - Choose <b>Lambda function</b> as <b>Integration type</b>
+  - Enable <b>Lambda proxy integration</b> option
+  - Choose the <b>Lambda function</b> to be triggered as specified above
+- For each route created, click on <b>Enable CORS</b>
+  - Enable all checkboxes under <b>Gateway responses</b> and <b>Access-Control-Allow-Methods</b>
+  - Add two headers in <b>Access-Control-Allow-Headers</b> (separate headers by comma): 'cognito-token' and 'airline-name'
+  - Click <b>Save</b>
+- Click on <b>Deploy API</b> to make changes effective (create a new stage)
+- In the <b>Stages</b> page, you can find the <b>Invoke URL</b> of the API gateway you just deployed. Record it for later use in the frontend
