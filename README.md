@@ -165,3 +165,33 @@ In the AWS console, find API Gateway:
   - Click <b>Save</b>
 - Click on <b>Deploy API</b> to make changes effective (create a new stage)
 - In the <b>Stages</b> page, you can find the <b>Invoke URL</b> of the API gateway you just deployed. Record it for later use in the [frontend](https://github.com/swqa7697/cs6650-frontend)
+
+<h2>Add Testing Data into the Database</h2>
+
+Since I didn't implement a UI for adding/updating new flights in the frontend, you can only use the api call <b>/flight/new</b> with Postman to add new flights
+
+If the configuration above are correctly performed, you can use this POST api with a body and required headers as below:
+
+body
+```
+{
+    "flightCode": "123",
+    "departure": "BOS",
+    "destination": "SJC",
+    "departureTime": "4/30/2024, 11:30:00 AM PDT",
+    "travelTime": 100,
+    "capacity": 120,
+    "price": 400,
+    "currency": "USD"
+}
+```
+headers
+```
+'cognito-token': 'cognito access token'
+'airline-name': 'airline name configured in the backend'
+```
+
+After logged in, you can find your access token in the Local Storage
+
+You will have to add your User Sub into the config.json to get permission, or you can just remove the permission checking middleware call from the router, which is in '/cs6650-backend/routes/flight.js'
+- Delete ', isCognitoAuthAdmin' from 'router.post('/new', isCognitoAuthAdmin, FlightController.addFlight);' in line 14
