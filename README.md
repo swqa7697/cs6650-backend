@@ -13,7 +13,7 @@ cd cs6650-backend
 
 Before starting the server, there are several things to be prepared:
 
-1. MongoDB Cluster: the cluster created on Atlas which is used by all api servers within the subsystem of an airline
+1. MongoDB Cluster: the cluster created on Atlas which is used by all api servers within the subsystem of an airline (The free M0 cluster of Atlas is default to have a 3-node replication enabled)
 2. AWS Cognito User Pool: the only user pool that is used by the entire system across all airlines
 3. API Key of API Ninjas: also used by all airlines (only one key required) for determining airport and timezone
 4. [Optional] List of Admin Users: fill the user subs (id used by Cognito) in the array to enable their permissions to add/update flights through API calls (You can get the user sub of yourself when creating your own account manually in the console of Cognito)
