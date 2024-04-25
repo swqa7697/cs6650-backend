@@ -131,7 +131,7 @@ and
 - Unzip them and edit the two 'constants.mjs' files according to the comments (configuring the airlines with their related load balancers)
   - The two 'constants.mjs' should be exactly same, so you can just edit one of them and use it for both functions
 - Click <b>Create function</b> in the Lambda console to create function
-  - There are two functions should be created, one called aggregation and another one called routing, both using the default Node.js runtime
+  - There are two functions should be created, one called <b>aggregation</b> and another one called <b>routing</b>, both using the default Node.js runtime
 - Copy/paste the code from the files you downloaded into the related functions
   - Make sure for both functions, the edited 'constants.mjs' are uploaded
 - For both functions, at the bottom of the <b>Code</b> page, click <b>Add a layer</b>, and choose <b>Specify an ARN</b> and enter the <b>Version ARN</b> you got in the previous step. Add the layer
