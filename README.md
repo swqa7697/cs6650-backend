@@ -164,4 +164,4 @@ In the AWS console, find API Gateway:
   - Add two headers in <b>Access-Control-Allow-Headers</b> (separate headers by comma): 'cognito-token' and 'airline-name'
   - Click <b>Save</b>
 - Click on <b>Deploy API</b> to make changes effective (create a new stage)
-- In the <b>Stages</b> page, you can find the <b>Invoke URL</b> of the API gateway you just deployed. Record it for later use in the frontend
+- In the <b>Stages</b> page, you can find the <b>Invoke URL</b> of the API gateway you just deployed. Record it for later use in the [frontend](https://github.com/swqa7697/cs6650-frontend)
